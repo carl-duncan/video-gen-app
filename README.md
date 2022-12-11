@@ -1,16 +1,18 @@
-# video_gen
+#video-Gen
 
-A new Flutter project.
+video-gen is a Flutter app that allows users to generate short video clips based on a given topic. The app uses the Dio package to make HTTP requests to a web service that generates the video clip.
 
-## Getting Started
+##Requirements
+- Flutter
 
-This project is a starting point for a Flutter application.
+##Installation
+To install the required dependencies, run:
 
-A few resources to get you started if this is your first Flutter project:
+`flutter pub get`
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+##Usage
+To run the app, use the following command:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+`flutter run
+`
+To generate a video clip, enter the topic in the text input field and click the "Generate" button. The app will make a POST request to the /generate-video endpoint of the web service with the topic as the request body. If the request is successful, the app will navigate to a success page that displays the URL of the generated video clip. The app also provides a loading indicator while the video is being generated.
