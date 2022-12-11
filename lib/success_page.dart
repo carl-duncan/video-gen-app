@@ -32,6 +32,7 @@ class _SuccessPageState extends State<SuccessPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        leading: const SizedBox.shrink(),
         actions: [
           IconButton(
             onPressed: () {
@@ -132,4 +133,6 @@ class _SuccessPageState extends State<SuccessPage> {
       ),
     );
   }
+
+  //
 }

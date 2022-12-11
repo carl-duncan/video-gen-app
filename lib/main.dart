@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:video_gen/success_page.dart';
 
@@ -30,6 +31,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Dio dio = Dio();
+  String url = "https://video-gen-dev-cdsoftwaresja.vercel.app/";
+  final TextEditingController _controller = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,11 +88,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(height: 40),
-              const SizedBox(
+              SizedBox(
                 width: 350,
                 child: TextField(
+                  controller: _controller,
                   textAlign: TextAlign.center,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: "Enter the topic of your video",
                     // centered
                   ),
@@ -91,15 +103,30 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 width: 350,
                 child: ElevatedButton(
-                  onPressed: () {},
-                  child: const Text("Generate"),
+                  onPressed: () {
+                    if (_controller.text.isNotEmpty) {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      generateVideo(
+                        _controller.text,
+                      );
+                    }
+                  },
+                  child: _isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                          ),
+                        )
+                      : const Text("Generate"),
                 ),
               ),
-
             ],
           ),
         ),
-
       ),
       bottomNavigationBar: Container(
         height: 50.0,
@@ -116,5 +143,46 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void generateVideo(String topic) async {
+    try {
+      print("Generating video...");
+      final response = await dio.post(
+        '${url}generate-video?query=$topic',
+      );
+      var statusId = response.data;
+      print("Status ID: $statusId");
+
+      while (true) {
+        try {
+          final statusResponse = await dio.get('${url}status/$statusId');
+          if (statusResponse.data['status'] == 'done') {
+            if (mounted) {
+              Navigator.push<SuccessPage>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SuccessPage(
+                    url: statusResponse.data['url'],
+                  ),
+                ),
+              );
+              setState(() {
+                _isLoading = true;
+              });
+            }
+            break;
+          }
+          await Future.delayed(const Duration(seconds: 5));
+        } catch (e) {
+          print("Error: $e");
+        }
+      }
+    } catch (e) {
+      print(e);
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }
